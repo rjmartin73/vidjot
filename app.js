@@ -1,5 +1,6 @@
 //******** Required modules **********//
 const express = require('express'); // main js framework
+const path = require('path');
 const exphbs = require('express-handlebars'); // framework helper
 const passport = require('passport');  // authentication module
 const methodOverride = require('method-override'); //
@@ -45,6 +46,10 @@ app.set('view engine', 'handlebars');
 app.use(bodyParser.urlencoded({
   extended: false
 }));
+
+//static folder
+app.use(express.static(path.join(__dirname,'public')));
+
 // parse application/json
 app.use(bodyParser.json());
 

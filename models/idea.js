@@ -14,6 +14,11 @@ const ideaSchema = new Schema({
   date:{
     type:Date,
     default: Date.now()
+  },
+  // this will store the users id
+  userid:{ 
+    type: String,
+    default: 'RM1'
   }
 });
 
