@@ -16,6 +16,9 @@ const app = express();
 const ideas = require('./routes/ideas')
 const users = require('./routes/users')
 
+// Passport config
+require('./config/passport')(passport);
+
 // body-parser create application/json parser
 const jsonParser = bodyParser.json();
 
