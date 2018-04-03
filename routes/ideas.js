@@ -1,6 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
+const {
+  ensureAuthenticated
+} = require('../helpers/auth');
 
 
 // Load idea model
@@ -9,9 +12,11 @@ const Idea = mongoose.model('ideas');
 
 
 // Idea Index Page
-router.get('/', (req, res) => {
+router.get('/', ensureAuthenticated, (req, res) => {
   const title = 'List of ideas'
-  Idea.find({})
+  Idea.find({
+      user: req.user.id
+    })
     .sort({
       date: 'desc'
     })
@@ -25,7 +30,7 @@ router.get('/', (req, res) => {
 });
 
 // add Idea form
-router.get('/add', (req, res) => {
+router.get('/add', ensureAuthenticated, (req, res) => {
   const {
     titleLabel,
     detailLabel
@@ -37,7 +42,7 @@ router.get('/add', (req, res) => {
 });
 
 // Edit Idea form
-router.get('/edit/:id', (req, res) => {
+router.get('/edit/:id', ensureAuthenticated, (req, res) => {
   const {
     titleLabel,
     detailLabel
@@ -46,16 +51,22 @@ router.get('/edit/:id', (req, res) => {
       _id: req.params.id
     })
     .then(idea => {
-      res.render('ideas/edit', {
-        idea: idea,
-        titleLabel: titleLabel,
-        detailLabel: detailLabel
-      })
+      if (idea.user != req.user.id) {
+        req.flash('error_msg', 'You don\'t have access to that record.')
+        res.redirect('/ideas')
+      } else {
+        res.render('ideas/edit', {
+          idea: idea,
+          titleLabel: titleLabel,
+          detailLabel: detailLabel
+        })
+      }
+
     })
 });
 
 // Process form
-router.post('/', (req, res) => {
+router.post('/', ensureAuthenticated, (req, res) => {
   let errors = [];
 
   if (!req.body.title) {
@@ -78,12 +89,13 @@ router.post('/', (req, res) => {
   } else {
     const newUser = {
       title: req.body.title,
-      details: req.body.details
+      details: req.body.details,
+      user: req.user.id
     }
     new Idea(newUser)
       .save()
       .then(idea => {
-        req.flash('success_msg','Video idea added.');
+        req.flash('success_msg', 'Video idea added.');
         res.redirect('ideas/')
       })
   }
@@ -91,34 +103,37 @@ router.post('/', (req, res) => {
 
 // Edit Form Process
 try {
-router.put('/:id', (req, res) => {
-  Idea.findOne({
-    _id: req.params.id
-  })
-  .then(idea => {
-    idea.title = req.body.title;
-    idea.details = req.body.details;
+  router.put('/:id', ensureAuthenticated, (req, res) => {
+    Idea.findOne({
+        _id: req.params.id
+      })
+      .then(idea => {
+        idea.title = req.body.title;
+        idea.details = req.body.details;
 
-    idea.save()
-    .then( idea => {
-      req.flash('success_msg','Video idea updated.');
-      res.redirect('./');
-    });
+        idea.save()
+          .then(idea => {
+            req.flash('success_msg', 'Video idea updated.');
+            res.redirect('./');
+          });
+      });
   });
-});
-} catch(err) {
-  res.send (err);
+} catch (err) {
+  res.send(err);
 }
 
 
 // Delete idea
-router.delete('/:id', (req, res) => {
-  Idea.remove({_id: req.params.id})
-  .then(() => {
-    req.flash('success_msg','Video idea removed.');
-    res.redirect('./');
-  });
+router.delete('/:id', ensureAuthenticated, (req, res) => {
+  Idea.remove({
+      _id: req.params.id
+    })
+    .then(() => {
+      req.flash('success_msg', 'Video idea removed.');
+      res.redirect('./');
+    });
 });
+
 function addLabels() {
   const titleLabel = 'Title';
   const detailLabel = 'Provide details';
