@@ -2,11 +2,11 @@
 const express = require('express'); // main js framework
 const path = require('path');
 const exphbs = require('express-handlebars'); // framework helper
-const passport = require('passport');  // authentication module
+const passport = require('passport'); // authentication module
 const methodOverride = require('method-override'); //
-const flash = require('connect-flash');  // messaging
+const flash = require('connect-flash'); // messaging
 const session = require('express-session'); // user session
-const bodyParser = require('body-parser');  // framework helper
+const bodyParser = require('body-parser'); // framework helper
 const mongoose = require('mongoose'); // mongodb connector
 
 // Initialize application
@@ -32,14 +32,14 @@ var urlencodedParser = bodyParser.urlencoded({
 mongoose.Promise = global.Promise;
 //mongoose.set('debug', true);
 // Connect to mongoose
-mongoose.connect('mongodb://localhost/vidjot-dev') // connect to mongoDB w/ mongoose
+mongoose.connect('mongodb://rjmartin73:K3rmitFr0g{}@ds133659.mlab.com:33659/vidjot-prod') // connect to mongoDB w/ mongoose
   .then(() => console.log('Mongodb connected...'))
   .catch(err => console.log(err))
 
 
 //******** set up middleware **********//
 // Handlebars middleware
-app.engine('handlebars', exphbs({           
+app.engine('handlebars', exphbs({
   defaultLayout: 'main'
 }));
 app.set('view engine', 'handlebars');
@@ -51,7 +51,7 @@ app.use(bodyParser.urlencoded({
 }));
 
 //static folder
-app.use(express.static(path.join(__dirname,'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // parse application/json
 app.use(bodyParser.json());
@@ -66,6 +66,10 @@ app.use(session({
   saveUninitialized: true
 }))
 
+// passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
 // flash middleware
 app.use(flash());
 
@@ -74,6 +78,7 @@ app.use((req, res, next) => {
   res.locals.success_msg = req.flash('success_msg');
   res.locals.error_msg = req.flash('error_msg');
   res.locals.error = req.flash('error');
+  res.locals.user = req.user || null;
   next();
 })
 
@@ -92,11 +97,11 @@ app.get('/about', (req, res) => {
 });
 
 //use routes
-app.use('/ideas/', ideas); 
+app.use('/ideas/', ideas);
 app.use('/users/', users);
 
 //set the listen port
-const port = 5000;
+const port = process.env.port || 5000;
 
 app.listen(port, () => {
   console.log(`Server started on port ${port}`)
