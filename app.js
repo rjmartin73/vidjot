@@ -13,13 +13,13 @@ const mongoose = require('mongoose'); // mongodb connector
 const app = express();
 
 // load routes
-const ideas = require('./routes/ideas')
-const users = require('./routes/users')
+const ideas = require('./routes/ideas');
+const users = require('./routes/users');
 
 // Passport config
 require('./config/passport')(passport);
 // DB config
-const db = require('./config/database')
+const db = require('./config/database');
 
 // body-parser create application/json parser
 const jsonParser = bodyParser.json();
@@ -27,7 +27,7 @@ const jsonParser = bodyParser.json();
 // create application/x-www-form-urlencoded parser
 var urlencodedParser = bodyParser.urlencoded({
   extended: false
-})
+});
 
 //******** Database connection **********//
 // Map global promise
@@ -39,7 +39,7 @@ mongoose.Promise = global.Promise;
 // We are now using the database.js file in config to connect
 mongoose.connect(db.mongoURI)
 .then(() => console.log('Mongodb connected...'))
-  .catch(err => console.log(err))
+  .catch(err => console.log(err));
 
 
 //******** set up middleware **********//
@@ -69,7 +69,7 @@ app.use(session({
   secret: 'secret',
   resave: true,
   saveUninitialized: true
-}))
+}));
 
 // passport middleware
 app.use(passport.initialize());
@@ -85,7 +85,7 @@ app.use((req, res, next) => {
   res.locals.error = req.flash('error');
   res.locals.user = req.user || null;
   next();
-})
+});
 
 //********  PAGES   *********** */
 // index route
@@ -109,5 +109,5 @@ app.use('/users/', users);
 const port = process.env.PORT || 5000; // for horuku
 
 app.listen(port, () => {
-  console.log(`Server started on port ${port}`)
+  console.log(`Server started on port ${port}`);
 });
