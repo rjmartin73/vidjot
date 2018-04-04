@@ -33,6 +33,7 @@ var urlencodedParser = bodyParser.urlencoded({
 // Map global promise
 mongoose.Promise = global.Promise;
 //mongoose.set('debug', true);
+
 // Connect to mongoose
 // connect to mongoDB w/ mongoose
 // We are now using the database.js file in config to connect
