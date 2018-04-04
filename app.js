@@ -18,6 +18,8 @@ const users = require('./routes/users')
 
 // Passport config
 require('./config/passport')(passport);
+// DB config
+const db = require('./config/database')
 
 // body-parser create application/json parser
 const jsonParser = bodyParser.json();
@@ -32,8 +34,10 @@ var urlencodedParser = bodyParser.urlencoded({
 mongoose.Promise = global.Promise;
 //mongoose.set('debug', true);
 // Connect to mongoose
-mongoose.connect('mongodb://rjmartin73:K3rmitFr0g{}@ds133659.mlab.com:33659/vidjot-prod') // connect to mongoDB w/ mongoose
-  .then(() => console.log('Mongodb connected...'))
+// connect to mongoDB w/ mongoose
+// We are now using the database.js file in config to connect
+mongoose.connect(db.mongoURI)
+.then(() => console.log('Mongodb connected...'))
   .catch(err => console.log(err))
 
 
@@ -101,7 +105,7 @@ app.use('/ideas/', ideas);
 app.use('/users/', users);
 
 //set the listen port
-const port = process.env.port || 5000;
+const port = process.env.PORT || 5000; // for horuku
 
 app.listen(port, () => {
   console.log(`Server started on port ${port}`)
