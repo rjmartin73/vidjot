@@ -26,7 +26,7 @@ router.post('/login', (req, res, next) => {
     failureRedirect: '/users/login',
     failureFlash: true
   })(req,res,next);
-})
+});
 
 //registration form route  
 router.post('/register', (req, res) => {
@@ -35,12 +35,12 @@ router.post('/register', (req, res) => {
   // validate passwords match
   if (req.body.password != req.body.confirm) {
     errors.push({ text: 'Passwords do not match.' });
-  };
+  }
 
   // validate password length
   if (req.body.password.length < 4) {
     errors.push({ text: 'Password must be at least 4 characters in length.' });
-  };
+  }
 
   if (errors.length > 0) {
     res.render('users/register', {
@@ -74,9 +74,9 @@ router.post('/register', (req, res) => {
                 .catch(err => {
                   console.log(err);
                   return;
-                })
+                });
             });
-          })
+          });
         }
       });
   // console.log(newUser)
@@ -88,6 +88,6 @@ router.get('/logout', (req,res) => {
   req.logout();
   req.flash('success_msg','You have succesfully logged out.');
   res.redirect('/users/login');
-})
+});
 
 module.exports = router;
