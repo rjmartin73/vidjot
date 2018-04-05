@@ -1,5 +1,4 @@
-// create an authentication strategy
-const LocalStrategy = require('passport-local').Strategy; 
+const LocalStrategy  = require('passport-local').Strategy;
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
@@ -7,31 +6,27 @@ const bcrypt = require('bcryptjs');
 const User = mongoose.model('users');
 
 module.exports = function(passport){
-  passport.use(new LocalStrategy({usernameField: 'email'}, (email,password, done) => {
+  passport.use(new LocalStrategy({usernameField: 'email'}, (email, password, done) => {
     // Match user
-    User.findOne({ 
-      email: email
+    User.findOne({
+      email:email
     }).then(user => {
       if(!user){
-        return done(null, false, {message: 'No user found.'});
-      }
+        return done(null, false, {message: 'No User Found'});
+      } 
 
       // Match password
       bcrypt.compare(password, user.password, (err, isMatch) => {
-        if(err) {
-          throw err; 
-        }
-        if(isMatch) {
-          return done(null, user)
+        if(err) throw err;
+        if(isMatch){
+          return done(null, user);
         } else {
-          return done(null, false, {message: 'Username or password is incorrect.'});
+          return done(null, false, {message: 'Password Incorrect'});
         }
-      });
+      })
     })
   }));
-  // http://www.passportjs.org/docs/downloads/html/
-  // create a user session and store in a cookie
-  
+
   passport.serializeUser(function(user, done) {
     done(null, user.id);
   });
@@ -41,4 +36,4 @@ module.exports = function(passport){
       done(err, user);
     });
   });
-};
+}
